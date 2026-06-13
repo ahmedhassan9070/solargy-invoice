@@ -43,8 +43,8 @@
         function InvoiceApp() {
             const [invoiceData, setInvoiceData] = useState({
                 date: new Date().toLocaleDateString('en-GB'),
-                invoiceNumber: 'INV-2026-001',
-                clientName: 'السيد/ محمد أحمد',
+                invoiceNumber: '', // تم التفريغ
+                clientName: '', // تم التفريغ
                 projectName: '', 
                 currency: 'جنيه سوداني',
                 notes: '10 سنوات ضمان للألواح وسنة للنظام.\nالمتابعة ما بعد التركيب.',
@@ -52,11 +52,12 @@
 
             const [discountPercent, setDiscountPercent] = useState(0);
 
+            // تم تصفير الجدول (4 صفوف فارغة)
             const [items, setItems] = useState([
-                { id: 1, description: 'حفر وتجهيز الأساسات', qty: 1, price: 450000 },
-                { id: 2, description: 'أعمال خرسانة (أعمدة وسقف)', qty: 1, price: 1200000 },
-                { id: 3, description: 'طوب وبناء جدران', qty: 2000, price: 150 },
-                { id: 4, description: 'أعمال بياض (محارة) داخلي وخارجي', qty: 1, price: 350000 },
+                { id: 1, description: '', qty: 0, price: 0 },
+                { id: 2, description: '', qty: 0, price: 0 },
+                { id: 3, description: '', qty: 0, price: 0 },
+                { id: 4, description: '', qty: 0, price: 0 },
             ]);
 
             const handleDataChange = (field, value) => {
@@ -77,7 +78,7 @@
                 const newItem = {
                     id: items.length > 0 ? Math.max(...items.map(i => i.id)) + 1 : 1,
                     description: '',
-                    qty: 1,
+                    qty: 0,
                     price: 0
                 };
                 setItems([...items, newItem]);
@@ -197,7 +198,7 @@
                                 </div>
                                 <div className="flex-1 flex items-center justify-end gap-2">
                                     <span className="font-bold text-gray-700">رقم الفاتورة:</span>
-                                    <input type="text" value={invoiceData.invoiceNumber} onChange={(e) => handleDataChange('invoiceNumber', e.target.value)} className="border-b border-transparent hover:border-gray-300 focus:border-[#4b3b94] outline-none w-32 text-left print:border-none bg-transparent font-mono" dir="ltr" />
+                                    <input type="text" value={invoiceData.invoiceNumber} onChange={(e) => handleDataChange('invoiceNumber', e.target.value)} className="border-b border-transparent hover:border-gray-300 focus:border-[#4b3b94] outline-none w-32 text-left print:border-none bg-transparent font-mono" dir="ltr" placeholder="اكتب الرقم" />
                                 </div>
                             </div>
                         </div>
@@ -205,7 +206,7 @@
                         <div className="px-10 mt-6 relative z-10">
                             <div className="text-center font-bold text-lg mb-4 flex justify-center items-center gap-2">
                                 <span>نظام مقاولة خاص لـ:</span>
-                                <input type="text" value={invoiceData.clientName} onChange={(e) => handleDataChange('clientName', e.target.value)} className="border-b border-gray-400 hover:border-[#4b3b94] outline-none text-center min-w-[250px] print:border-none bg-transparent text-[#2d206b]" />
+                                <input type="text" value={invoiceData.clientName} onChange={(e) => handleDataChange('clientName', e.target.value)} className="border-b border-gray-400 hover:border-[#4b3b94] outline-none text-center min-w-[250px] print:border-none bg-transparent text-[#2d206b]" placeholder="اكتب اسم العميل هنا..." />
                             </div>
                             <div className="bg-gray-100 border border-gray-300 rounded p-3 text-center mb-6 shadow-sm">
                                 <input type="text" value={invoiceData.projectName} onChange={(e) => handleDataChange('projectName', e.target.value)} className="w-full text-center outline-none bg-transparent font-bold text-gray-800 print:border-none" placeholder="اكتب وصف المشروع أو التفاصيل هنا..." />
@@ -236,12 +237,12 @@
                                                 <input type="text" value={item.description} onChange={(e) => handleItemChange(item.id, 'description', e.target.value)} className="w-full outline-none bg-transparent px-2" placeholder="وصف العمل أو المادة..." />
                                             </td>
                                             <td className="border-l border-gray-400 p-1">
-                                                <input type="number" value={item.qty === 0 ? '' : item.qty} onChange={(e) => handleItemChange(item.id, 'qty', e.target.value)} className="w-full outline-none text-center bg-transparent" />
+                                                <input type="number" value={item.qty === 0 ? '' : item.qty} onChange={(e) => handleItemChange(item.id, 'qty', e.target.value)} className="w-full outline-none text-center bg-transparent" placeholder="-" />
                                             </td>
                                             <td className="border-l border-gray-400 p-1 bg-gray-50">
-                                                <input type="number" value={item.price === 0 ? '' : item.price} onChange={(e) => handleItemChange(item.id, 'price', e.target.value)} className="w-full outline-none text-center bg-transparent" />
+                                                <input type="number" value={item.price === 0 ? '' : item.price} onChange={(e) => handleItemChange(item.id, 'price', e.target.value)} className="w-full outline-none text-center bg-transparent" placeholder="-" />
                                             </td>
-                                            <td className="border-l border-gray-400 py-2 font-bold bg-gray-100">{formatNumber(item.qty * item.price)}</td>
+                                            <td className="border-l border-gray-400 py-2 font-bold bg-gray-100">{item.qty * item.price === 0 ? '-' : formatNumber(item.qty * item.price)}</td>
                                             <td className="py-1 print-hidden text-center">
                                                 <button onClick={() => removeItem(item.id)} className="text-red-500 hover:text-red-700 p-1"><IconTrash /></button>
                                             </td>
@@ -250,7 +251,7 @@
                                     
                                     <tr className={`border-t-2 border-gray-400 bg-[#eeecf5] font-bold ${discountPercent > 0 ? '' : 'text-lg'}`}>
                                         <td colSpan="4" className="border-l border-gray-400 py-3 text-center text-[#2d206b]">{discountPercent > 0 ? 'الإجمالي (قبل الخصم)' : 'الإجمالي الكلي (الجملة)'}</td>
-                                        <td className={`border-l border-gray-400 py-3 text-center ${discountPercent > 0 ? '' : 'underline decoration-double'}`}>{formatNumber(subTotal)}</td>
+                                        <td className={`border-l border-gray-400 py-3 text-center ${discountPercent > 0 ? '' : 'underline decoration-double'}`}>{subTotal === 0 ? '-' : formatNumber(subTotal)}</td>
                                         <td className="print-hidden"></td>
                                     </tr>
 
@@ -271,7 +272,7 @@
                                     {discountPercent > 0 && (
                                         <tr className="border-t-2 border-gray-400 bg-[#2d206b] text-white font-bold text-lg">
                                             <td colSpan="4" className="border-l border-gray-400 py-3 text-center">الصافي النهائي</td>
-                                            <td className="border-l border-gray-400 py-3 text-center underline decoration-double">{formatNumber(total)}</td>
+                                            <td className="border-l border-gray-400 py-3 text-center underline decoration-double">{total === 0 ? '-' : formatNumber(total)}</td>
                                             <td className="print-hidden"></td>
                                         </tr>
                                     )}
