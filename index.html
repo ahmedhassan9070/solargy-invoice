@@ -18,11 +18,26 @@
     
     <style>
         .font-cursive { font-family: 'Dancing Script', cursive; }
-        /* إعدادات الطباعة لضمان ظهور الألوان */
+        
+        /* كود الطباعة الإجباري والمعدل لحل مشكلة الصفحة البيضاء جذرياً */
         @media print {
-            body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            @page { margin: 0; size: A4 portrait; }
+            body, html { 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
             .print-hidden { display: none !important; }
-            @page { margin: 0; }
+            
+            /* هذه الأسطر تجبر المتصفح على عدم إخفاء الفاتورة خارج الورقة */
+            #root, #root > div {
+                display: block !important; 
+                height: auto !important;
+                min-height: auto !important;
+                overflow: visible !important;
+            }
         }
     </style>
 </head>
@@ -43,8 +58,8 @@
         function InvoiceApp() {
             const [invoiceData, setInvoiceData] = useState({
                 date: new Date().toLocaleDateString('en-GB'),
-                invoiceNumber: '', // تم التفريغ
-                clientName: '', // تم التفريغ
+                invoiceNumber: '',
+                clientName: '',
                 projectName: '', 
                 currency: 'جنيه سوداني',
                 notes: '10 سنوات ضمان للألواح وسنة للنظام.\nالمتابعة ما بعد التركيب.',
@@ -52,7 +67,6 @@
 
             const [discountPercent, setDiscountPercent] = useState(0);
 
-            // تم تصفير الجدول (4 صفوف فارغة)
             const [items, setItems] = useState([
                 { id: 1, description: '', qty: 0, price: 0 },
                 { id: 2, description: '', qty: 0, price: 0 },
@@ -147,8 +161,8 @@
             };
 
             return (
-                /* تم إزالة كلاس print-hidden من هنا لكي تظهر الفاتورة في الطباعة */
-                <div className="min-h-screen py-8 print:py-0 flex justify-center font-sans">
+                /* تم إضافة print:block هنا لمنع المتصفح من دفع المحتوى خارج الورقة */
+                <div className="min-h-screen py-8 print:py-0 flex print:block justify-center font-sans print:m-0">
                     
                     <div className="fixed top-4 left-4 z-50 print-hidden flex flex-col gap-3">
                         <button 
@@ -160,7 +174,8 @@
                         </button>
                     </div>
 
-                    <div className="w-full max-w-[210mm] min-h-[297mm] bg-white shadow-2xl print:shadow-none print:w-full relative overflow-hidden flex flex-col mx-auto">
+                    {/* تم تعديل overflow-hidden بإضافة print:overflow-visible لمنع القطع والإخفاء */}
+                    <div className="w-full max-w-[210mm] min-h-[297mm] bg-white shadow-2xl print:shadow-none print:w-full relative overflow-hidden print:overflow-visible flex flex-col mx-auto print:block">
                         
                         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-5 pointer-events-none">
                             <AmiasLogo className="w-[800px] h-auto" />
@@ -193,8 +208,8 @@
                                     <input type="text" value={invoiceData.date} onChange={(e) => handleDataChange('date', e.target.value)} className="border-b border-transparent hover:border-gray-300 focus:border-[#4b3b94] outline-none w-28 text-left print:border-none bg-transparent" />
                                 </div>
                                 <div className="flex-1 flex justify-center items-center relative">
-                                    <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-3 h-3 bg-gray-300 rounded-full hidden md:block"></div>
-                                    <div className="absolute top-1/2 right-0 transform -translate-y-1/2 w-3 h-3 bg-gray-300 rounded-full hidden md:block"></div>
+                                    <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-3 h-3 bg-gray-300 rounded-full hidden md:block print:block"></div>
+                                    <div className="absolute top-1/2 right-0 transform -translate-y-1/2 w-3 h-3 bg-gray-300 rounded-full hidden md:block print:block"></div>
                                     <h2 className="text-2xl font-bold text-[#2d206b] border-b-4 border-gray-300 pb-1 px-8 text-center">فاتورة</h2>
                                 </div>
                                 <div className="flex-1 flex items-center justify-end gap-2">
@@ -209,7 +224,7 @@
                                 <span>نظام مقاولة خاص لـ:</span>
                                 <input type="text" value={invoiceData.clientName} onChange={(e) => handleDataChange('clientName', e.target.value)} className="border-b border-gray-400 hover:border-[#4b3b94] outline-none text-center min-w-[250px] print:border-none bg-transparent text-[#2d206b]" placeholder="اكتب اسم العميل هنا..." />
                             </div>
-                            <div className="bg-gray-100 border border-gray-300 rounded p-3 text-center mb-6 shadow-sm">
+                            <div className="bg-gray-100 border border-gray-300 rounded p-3 text-center mb-6 shadow-sm print:shadow-none">
                                 <input type="text" value={invoiceData.projectName} onChange={(e) => handleDataChange('projectName', e.target.value)} className="w-full text-center outline-none bg-transparent font-bold text-gray-800 print:border-none" placeholder="اكتب وصف المشروع أو التفاصيل هنا..." />
                             </div>
                         </div>
@@ -298,13 +313,12 @@
                             </div>
 
                             <div className="flex-1 flex justify-center items-center gap-6 mt-6 opacity-90">
-                                {/* تغيير المسار هنا ليطابق صورك المرفوعة */}
                                 <QRCodeImage src="./facebook.png.png" filename="facebook.png.png" label="Facebook" />
                                 <QRCodeImage src="./tiktok.png.jfif" filename="tiktok.png.jfif" label="TikTok" />
                             </div>
 
                             <div className="flex-[0.8] flex flex-col items-center justify-center opacity-80 mt-2">
-                                <div className="w-28 h-28 rounded-full border-4 border-[#2d206b] border-dashed flex items-center justify-center flex-col text-[#2d206b] transform -rotate-12">
+                                <div className="w-28 h-28 rounded-full border-4 border-[#2d206b] border-dashed flex items-center justify-center flex-col text-[#2d206b] transform -rotate-12 print:border-solid">
                                     <AmiasLogo className="w-12 h-auto mb-1 opacity-70" />
                                     <span className="text-[9px] font-bold font-serif text-center uppercase tracking-widest mt-1">AMIAS<br/>APPROVED</span>
                                 </div>
