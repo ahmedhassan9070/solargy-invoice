@@ -9,90 +9,71 @@
         @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
         @media print { 
             .print-hidden { display: none !important; }
-            body { background: white; }
-            .invoice-container { box-shadow: none; border: none; }
+            body { background-color: white; }
         }
     </style>
 </head>
-<body class="bg-gray-100 py-8">
+<body class="bg-gray-100 py-10">
 
-    <div id="invoice" class="invoice-container w-[210mm] mx-auto bg-white shadow-2xl p-10 min-h-[297mm]">
-        <!-- Header Section -->
-        <div class="flex justify-between items-center border-b-2 border-[#2d206b] pb-4 mb-8">
-            <h1 class="text-3xl font-bold text-[#2d206b]">شركة امياس للمقاولات</h1>
-            <div class="text-center">
-                <div class="flex justify-center mb-1">
-                    <svg viewBox="0 0 300 180" class="w-24 h-auto" xmlns="http://www.w3.org/2000/svg">
-                        <g>
-                            {[60, 90, 120, 150].map((y) => (
-                                <g>
-                                    <polygon points="10,${y} 50,${y-15} 50,${y} 10,${y+15}" fill="#4b3b94" />
-                                    <polygon points="50,${y-15} 90,${y} 90,${y+15} 50,${y}" fill="#2d206b" />
-                                </g>
-                            ))}
-                        </g>
-                    </svg>
-                </div>
-                <h1 class="text-3xl font-bold text-[#2d206b]" style="font-family: 'Dancing Script', cursive;">Amias</h1>
-            </div>
+    <div class="max-w-4xl mx-auto bg-white p-10 shadow-2xl rounded-lg">
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b-2 border-indigo-900 pb-6 mb-8">
+            <h1 class="text-3xl font-bold text-indigo-900">شركة أمياس للمقاولات</h1>
+            <h1 class="text-4xl font-bold text-indigo-900" style="font-family: 'Dancing Script', cursive;">Amias</h1>
         </div>
 
-        <!-- Info Section -->
-        <div class="flex justify-between font-bold mb-8">
-            <div>التاريخ: <input class="border-b outline-none w-32" value="13/06/2026"></div>
-            <div>العميل: <input class="border-b outline-none w-48" placeholder="اسم العميل..."></div>
+        <!-- Info -->
+        <div class="flex justify-between mb-8 font-semibold text-gray-700">
+            <div>التاريخ: <input type="text" class="border-b outline-none w-32" value="13/06/2026"></div>
+            <div>العميل: <input type="text" class="border-b outline-none w-48" placeholder="اسم العميل..."></div>
         </div>
 
-        <!-- Table Section -->
-        <table class="w-full border-collapse border border-gray-300 text-center mb-8">
-            <thead class="bg-[#2d206b] text-white">
+        <!-- Table -->
+        <table class="w-full border-collapse border border-gray-300 text-center mb-6">
+            <thead class="bg-indigo-900 text-white">
                 <tr>
-                    <th class="border p-2">م</th>
-                    <th class="border p-2">البيان</th>
-                    <th class="border p-2">الكمية</th>
-                    <th class="border p-2">السعر</th>
-                    <th class="border p-2">الإجمالي</th>
-                    <th class="border p-2 print-hidden">حذف</th>
+                    <th class="border p-3">البيان</th>
+                    <th class="border p-3">الكمية</th>
+                    <th class="border p-3">السعر</th>
+                    <th class="border p-3">الإجمالي</th>
+                    <th class="border p-3 print-hidden">إجراء</th>
                 </tr>
             </thead>
             <tbody id="itemsBody">
                 <tr>
-                    <td class="border p-2">1</td>
-                    <td class="border p-2"><input class="w-full outline-none text-center" value="أعمال خرسانية"></td>
+                    <td class="border p-2"><input type="text" class="w-full outline-none text-center"></td>
                     <td class="border p-2"><input type="number" class="w-full outline-none text-center qty" value="1" oninput="calculate()"></td>
                     <td class="border p-2"><input type="number" class="w-full outline-none text-center price" value="0" oninput="calculate()"></td>
                     <td class="border p-2 total font-bold">0</td>
-                    <td class="border p-2 print-hidden"><button onclick="this.parentElement.parentElement.remove(); calculate()" class="text-red-500">✕</button></td>
+                    <td class="border p-2 print-hidden"><button onclick="this.parentElement.parentElement.remove(); calculate()" class="text-red-500 font-bold">حذف</button></td>
                 </tr>
             </tbody>
         </table>
 
-        <button onclick="addRow()" class="print-hidden mb-8 text-[#2d206b] font-bold">+ إضافة صنف</button>
+        <button onclick="addRow()" class="print-hidden bg-indigo-900 text-white px-6 py-2 rounded mb-8 font-bold hover:bg-indigo-800 transition">إضافة صنف</button>
 
-        <div class="text-xl font-bold border-t pt-4">
+        <div class="text-xl font-bold border-t pt-4 text-indigo-900">
             الإجمالي النهائي: <span id="grandTotal">0</span> جنيه سوداني
         </div>
 
-        <div class="mt-auto pt-10 text-sm text-gray-600">
-            <p class="font-bold mb-2">ملاحظات:</p>
-            <textarea class="w-full outline-none resize-none border p-2" rows="3">10 سنوات ضمان للألواح وسنة للنظام.</textarea>
+        <div class="mt-8 text-gray-600">
+            <p class="font-bold">ملاحظات:</p>
+            <textarea class="w-full border p-2 mt-2 rounded" rows="3">10 سنوات ضمان للألواح وسنة للنظام. المتابعة ما بعد التركيب.</textarea>
         </div>
 
-        <button onclick="window.print()" class="print-hidden mt-8 w-full bg-[#2d206b] text-white py-3 rounded-xl font-bold">طباعة الفاتورة</button>
+        <button onclick="window.print()" class="print-hidden mt-8 w-full bg-green-600 text-white py-3 rounded text-lg font-bold hover:bg-green-700 transition">طباعة الفاتورة</button>
     </div>
 
     <script>
         function addRow() {
             const tbody = document.getElementById('itemsBody');
             const row = document.createElement('tr');
-            const count = tbody.children.length + 1;
             row.innerHTML = `
-                <td class="border p-2">${count}</td>
-                <td class="border p-2"><input class="w-full outline-none text-center"></td>
+                <td class="border p-2"><input type="text" class="w-full outline-none text-center"></td>
                 <td class="border p-2"><input type="number" class="w-full outline-none text-center qty" value="1" oninput="calculate()"></td>
                 <td class="border p-2"><input type="number" class="w-full outline-none text-center price" value="0" oninput="calculate()"></td>
                 <td class="border p-2 total font-bold">0</td>
-                <td class="border p-2 print-hidden"><button onclick="this.parentElement.parentElement.remove(); calculate()" class="text-red-500">✕</button></td>
+                <td class="border p-2 print-hidden"><button onclick="this.parentElement.parentElement.remove(); calculate()" class="text-red-500 font-bold">حذف</button></td>
             `;
             tbody.appendChild(row);
         }
