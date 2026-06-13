@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فاتورة أمياس للمقاولات</title>
+    <title>فاتورة شركة أمياس للمقاولات</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
+        /* هذا الجزء هو المسؤول عن إخفاء الأزرار عند الطباعة */
         @media print { 
             .print-hidden { display: none !important; }
             body { background-color: white; }
+            .no-shadow { box-shadow: none !important; border: none !important; }
         }
     </style>
 </head>
 <body class="bg-gray-100 py-10">
 
-    <div class="max-w-4xl mx-auto bg-white p-10 shadow-2xl rounded-lg">
+    <div class="max-w-4xl mx-auto bg-white p-10 shadow-2xl rounded-lg no-shadow">
         <!-- Header -->
         <div class="flex justify-between items-center border-b-2 border-indigo-900 pb-6 mb-8">
             <h1 class="text-3xl font-bold text-indigo-900">شركة أمياس للمقاولات</h1>
