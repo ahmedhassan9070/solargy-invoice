@@ -3,48 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فاتورة أمياس للمقاولات</title>
-    
-    <!-- تحميل مكتبة Tailwind للتصميم -->
+    <title>فاتورة شركة أمياس للمقاولات</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- تحميل مكتبات React لتعمل مباشرة من المتصفح -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <!-- الخط الإنجليزي -->
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        .font-cursive { font-family: 'Dancing Script', cursive; }
-        
-        /* إضافة بسيطة لضمان عمل الطباعة كما طلبت */
-        @media print {
-            body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .print-hidden { display: none !important; }
-            @page { margin: 0; }
-        }
-    </style>
 </head>
-<body>
+<body class="bg-gray-100">
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState } = React;
-
         function App() {
-            // هنا محتوى الكود الخاص بك بالكامل كما هو
             return (
-                <div className="min-h-screen bg-gray-100 p-4">
-                    {/* بقية كود الـ React الخاص بك موجود هنا وسيعمل كما هو */}
-                    <div className="print-hidden">
-                        {/* الأزرار التي ستختفي عند الطباعة */}
+                <div className="p-10 bg-white max-w-4xl mx-auto shadow-lg mt-10" dir="rtl">
+                    <h1 className="text-3xl font-bold text-center text-blue-900 mb-6">شركة أمياس للمقاولات</h1>
+                    <div className="flex justify-between border-b pb-4 mb-6">
+                        <span>التاريخ: {new Date().toLocaleDateString()}</span>
+                        <span className="font-bold">Amias Contracting</span>
                     </div>
+                    <table className="w-full border-collapse border border-gray-300 text-center mb-6">
+                        <thead className="bg-blue-900 text-white">
+                            <tr>
+                                <th className="border p-2">البيان</th>
+                                <th className="border p-2">الكمية</th>
+                                <th className="border p-2">السعر</th>
+                                <th className="border p-2">الإجمالي</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="border p-2">أعمال كهربائية</td>
+                                <td className="border p-2">1</td>
+                                <td className="border p-2">0</td>
+                                <td className="border p-2">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button onClick={() => window.print()} className="bg-green-600 text-white px-6 py-2 rounded print:hidden">طباعة الفاتورة</button>
                 </div>
             );
         }
-
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
