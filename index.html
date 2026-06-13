@@ -3,94 +3,333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فاتورة شركة أمياس للمقاولات</title>
+    <title>فاتورة أمياس للمقاولات</title>
+    
+    <!-- تحميل مكتبة Tailwind للتصميم -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- تحميل مكتبات React لتعمل مباشرة من المتصفح -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- الخط الإنجليزي -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
-        /* هذا الجزء هو المسؤول عن إخفاء الأزرار عند الطباعة */
-        @media print { 
+        .font-cursive { font-family: 'Dancing Script', cursive; }
+        /* إعدادات الطباعة لضمان ظهور الألوان */
+        @media print {
+            body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .print-hidden { display: none !important; }
-            body { background-color: white; }
-            .no-shadow { box-shadow: none !important; border: none !important; }
+            @page { margin: 0; }
         }
     </style>
 </head>
-<body class="bg-gray-100 py-10">
+<body class="bg-gray-100 print:bg-white">
+    <div id="root"></div>
 
-    <div class="max-w-4xl mx-auto bg-white p-10 shadow-2xl rounded-lg no-shadow">
-        <!-- Header -->
-        <div class="flex justify-between items-center border-b-2 border-indigo-900 pb-6 mb-8">
-            <h1 class="text-3xl font-bold text-indigo-900">شركة أمياس للمقاولات</h1>
-            <h1 class="text-4xl font-bold text-indigo-900" style="font-family: 'Dancing Script', cursive;">Amias</h1>
-        </div>
+    <script type="text/babel">
+        const { useState } = React;
 
-        <!-- Info -->
-        <div class="flex justify-between mb-8 font-semibold text-gray-700">
-            <div>التاريخ: <input type="text" class="border-b outline-none w-32" value="13/06/2026"></div>
-            <div>العميل: <input type="text" class="border-b outline-none w-48" placeholder="اسم العميل..."></div>
-        </div>
+        // --- أيقونات SVG ---
+        const IconPrinter = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>;
+        const IconPlus = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>;
+        const IconTrash = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>;
+        const IconPhone = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>;
+        const IconHash = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>;
+        const IconMail = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>;
 
-        <!-- Table -->
-        <table class="w-full border-collapse border border-gray-300 text-center mb-6">
-            <thead class="bg-indigo-900 text-white">
-                <tr>
-                    <th class="border p-3">البيان</th>
-                    <th class="border p-3">الكمية</th>
-                    <th class="border p-3">السعر</th>
-                    <th class="border p-3">الإجمالي</th>
-                    <th class="border p-3 print-hidden">إجراء</th>
-                </tr>
-            </thead>
-            <tbody id="itemsBody">
-                <tr>
-                    <td class="border p-2"><input type="text" class="w-full outline-none text-center"></td>
-                    <td class="border p-2"><input type="number" class="w-full outline-none text-center qty" value="1" oninput="calculate()"></td>
-                    <td class="border p-2"><input type="number" class="w-full outline-none text-center price" value="0" oninput="calculate()"></td>
-                    <td class="border p-2 total font-bold">0</td>
-                    <td class="border p-2 print-hidden"><button onclick="this.parentElement.parentElement.remove(); calculate()" class="text-red-500 font-bold">حذف</button></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <button onclick="addRow()" class="print-hidden bg-indigo-900 text-white px-6 py-2 rounded mb-8 font-bold hover:bg-indigo-800 transition">إضافة صنف</button>
-
-        <div class="text-xl font-bold border-t pt-4 text-indigo-900">
-            الإجمالي النهائي: <span id="grandTotal">0</span> جنيه سوداني
-        </div>
-
-        <div class="mt-8 text-gray-600">
-            <p class="font-bold">ملاحظات:</p>
-            <textarea class="w-full border p-2 mt-2 rounded" rows="3">10 سنوات ضمان للألواح وسنة للنظام. المتابعة ما بعد التركيب.</textarea>
-        </div>
-
-        <button onclick="window.print()" class="print-hidden mt-8 w-full bg-green-600 text-white py-3 rounded text-lg font-bold hover:bg-green-700 transition">طباعة الفاتورة</button>
-    </div>
-
-    <script>
-        function addRow() {
-            const tbody = document.getElementById('itemsBody');
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="border p-2"><input type="text" class="w-full outline-none text-center"></td>
-                <td class="border p-2"><input type="number" class="w-full outline-none text-center qty" value="1" oninput="calculate()"></td>
-                <td class="border p-2"><input type="number" class="w-full outline-none text-center price" value="0" oninput="calculate()"></td>
-                <td class="border p-2 total font-bold">0</td>
-                <td class="border p-2 print-hidden"><button onclick="this.parentElement.parentElement.remove(); calculate()" class="text-red-500 font-bold">حذف</button></td>
-            `;
-            tbody.appendChild(row);
-        }
-
-        function calculate() {
-            let grandTotal = 0;
-            document.querySelectorAll('#itemsBody tr').forEach(row => {
-                const qty = parseFloat(row.querySelector('.qty').value) || 0;
-                const price = parseFloat(row.querySelector('.price').value) || 0;
-                const total = qty * price;
-                row.querySelector('.total').innerText = total;
-                grandTotal += total;
+        function InvoiceApp() {
+            const [invoiceData, setInvoiceData] = useState({
+                date: new Date().toLocaleDateString('en-GB'),
+                invoiceNumber: '', // تم التفريغ
+                clientName: '', // تم التفريغ
+                projectName: '', 
+                currency: 'جنيه سوداني',
+                notes: '10 سنوات ضمان للألواح وسنة للنظام.\nالمتابعة ما بعد التركيب.',
             });
-            document.getElementById('grandTotal').innerText = grandTotal;
+
+            const [discountPercent, setDiscountPercent] = useState(0);
+
+            // تم تصفير الجدول (4 صفوف فارغة)
+            const [items, setItems] = useState([
+                { id: 1, description: '', qty: 0, price: 0 },
+                { id: 2, description: '', qty: 0, price: 0 },
+                { id: 3, description: '', qty: 0, price: 0 },
+                { id: 4, description: '', qty: 0, price: 0 },
+            ]);
+
+            const handleDataChange = (field, value) => {
+                setInvoiceData({ ...invoiceData, [field]: value });
+            };
+
+            const handleItemChange = (id, field, value) => {
+                const updatedItems = items.map(item => {
+                    if (item.id === id) {
+                        return { ...item, [field]: field === 'qty' || field === 'price' ? Number(value) : value };
+                    }
+                    return item;
+                });
+                setItems(updatedItems);
+            };
+
+            const addItem = () => {
+                const newItem = {
+                    id: items.length > 0 ? Math.max(...items.map(i => i.id)) + 1 : 1,
+                    description: '',
+                    qty: 0,
+                    price: 0
+                };
+                setItems([...items, newItem]);
+            };
+
+            const removeItem = (id) => {
+                setItems(items.filter(item => item.id !== id));
+            };
+
+            const subTotal = items.reduce((sum, item) => sum + (item.qty * item.price), 0);
+            const discountAmount = (subTotal * (discountPercent || 0)) / 100;
+            const total = subTotal - discountAmount;
+
+            const handlePrint = () => {
+                window.print();
+            };
+
+            const formatNumber = (num) => {
+                return num.toLocaleString('en-US');
+            };
+
+            const AmiasLogo = ({ className = "w-32 h-auto" }) => (
+                <svg viewBox="0 0 300 180" className={className} xmlns="http://www.w3.org/2000/svg">
+                    <g>
+                        {[60, 90, 120, 150].map((y, i) => (
+                            <g key={`l-${i}`}>
+                                <polygon points={`10,${y} 50,${y-15} 50,${y} 10,${y+15}`} fill="#4b3b94" />
+                                <polygon points={`50,${y-15} 90,${y} 90,${y+15} 50,${y}`} fill="#2d206b" />
+                            </g>
+                        ))}
+                        {[30, 60, 90, 120, 150].map((y, i) => (
+                            <g key={`m-${i}`}>
+                                <polygon points={`110,${y} 150,${y-15} 150,${y} 110,${y+15}`} fill="#4b3b94" />
+                                <polygon points={`150,${y-15} 190,${y} 190,${y+15} 150,${y}`} fill="#2d206b" />
+                            </g>
+                        ))}
+                        {[60, 90, 120, 150].map((y, i) => (
+                            <g key={`r-${i}`}>
+                                <polygon points={`210,${y} 250,${y-15} 250,${y} 210,${y+15}`} fill="#4b3b94" />
+                                <polygon points={`250,${y-15} 290,${y} 290,${y+15} 250,${y}`} fill="#2d206b" />
+                            </g>
+                        ))}
+                    </g>
+                </svg>
+            );
+
+            const QRCodeImage = ({ src, filename, label }) => {
+                const [error, setError] = useState(false);
+                return (
+                    <div className="flex flex-col items-center">
+                        {error ? (
+                            <div className="w-16 h-16 bg-gray-200 border-2 border-dashed border-gray-400 rounded-md flex items-center justify-center text-center p-1">
+                                <span className="text-[9px] text-gray-500 leading-tight">ضع صورة<br/>{filename}<br/>هنا</span>
+                            </div>
+                        ) : (
+                            <img 
+                                src={src} 
+                                alt={label} 
+                                onError={() => setError(true)} 
+                                className="w-16 h-16 object-contain bg-white p-0.5 border border-gray-300 rounded-md" 
+                            />
+                        )}
+                        <span className="text-[10px] font-bold text-[#2d206b] mt-1 tracking-wider uppercase">{label}</span>
+                    </div>
+                );
+            };
+
+            return (
+                <div className="min-h-screen py-8 print-hidden print:py-0 flex justify-center font-sans">
+                    
+                    <div className="fixed top-4 left-4 z-50 print-hidden flex flex-col gap-3">
+                        <button 
+                            onClick={handlePrint}
+                            className="bg-[#2d206b] hover:bg-[#1a1240] text-white p-4 rounded-full shadow-lg flex items-center justify-center gap-2 transition-transform hover:scale-105"
+                            title="طباعة / حفظ كـ PDF"
+                        >
+                            <IconPrinter />
+                        </button>
+                    </div>
+
+                    <div className="w-full max-w-[210mm] min-h-[297mm] bg-white shadow-2xl print:shadow-none print:w-full relative overflow-hidden flex flex-col mx-auto">
+                        
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-5 pointer-events-none">
+                            <AmiasLogo className="w-[800px] h-auto" />
+                        </div>
+
+                        <div className="relative">
+                            <svg className="absolute top-0 left-0 w-full h-48 pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                <path d="M0,0 L100,0 L100,20 Q50,40 0,20 Z" fill="#4b3b94" opacity="0.1" />
+                                <path d="M0,0 L100,0 L100,10 Q50,30 0,10 Z" fill="#2d206b" opacity="0.8" />
+                                <path d="M30,0 L70,0 L50,15 Z" fill="#D1D5DB" opacity="0.9" />
+                            </svg>
+
+                            <div className="pt-10 px-8 pb-4 flex justify-between items-center relative z-10 text-[#2d206b]">
+                                <div className="text-right flex-1">
+                                    <h1 className="text-3xl font-bold mb-1">شركة امياس للمقاولات</h1>
+                                </div>
+                                <div className="flex-1 flex flex-col items-center justify-center mt-2">
+                                    <AmiasLogo className="w-32 h-auto drop-shadow-md" />
+                                </div>
+                                <div className="text-left flex-1" dir="ltr">
+                                    <h1 className="text-4xl font-cursive mb-1 tracking-wider text-[#2d206b]">Amias Contracting Company</h1>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="px-10 mt-2 relative z-10">
+                            <div className="flex items-center border-b-2 border-[#2d206b] pb-2 mt-4">
+                                <div className="flex-1 flex items-center justify-start gap-2">
+                                    <span className="font-bold text-gray-700">التاريخ:</span>
+                                    <input type="text" value={invoiceData.date} onChange={(e) => handleDataChange('date', e.target.value)} className="border-b border-transparent hover:border-gray-300 focus:border-[#4b3b94] outline-none w-28 text-left print:border-none bg-transparent" />
+                                </div>
+                                <div className="flex-1 flex justify-center items-center relative">
+                                    <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-3 h-3 bg-gray-300 rounded-full hidden md:block"></div>
+                                    <div className="absolute top-1/2 right-0 transform -translate-y-1/2 w-3 h-3 bg-gray-300 rounded-full hidden md:block"></div>
+                                    <h2 className="text-2xl font-bold text-[#2d206b] border-b-4 border-gray-300 pb-1 px-8 text-center">فاتورة</h2>
+                                </div>
+                                <div className="flex-1 flex items-center justify-end gap-2">
+                                    <span className="font-bold text-gray-700">رقم الفاتورة:</span>
+                                    <input type="text" value={invoiceData.invoiceNumber} onChange={(e) => handleDataChange('invoiceNumber', e.target.value)} className="border-b border-transparent hover:border-gray-300 focus:border-[#4b3b94] outline-none w-32 text-left print:border-none bg-transparent font-mono" dir="ltr" placeholder="اكتب الرقم" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="px-10 mt-6 relative z-10">
+                            <div className="text-center font-bold text-lg mb-4 flex justify-center items-center gap-2">
+                                <span>نظام مقاولة خاص لـ:</span>
+                                <input type="text" value={invoiceData.clientName} onChange={(e) => handleDataChange('clientName', e.target.value)} className="border-b border-gray-400 hover:border-[#4b3b94] outline-none text-center min-w-[250px] print:border-none bg-transparent text-[#2d206b]" placeholder="اكتب اسم العميل هنا..." />
+                            </div>
+                            <div className="bg-gray-100 border border-gray-300 rounded p-3 text-center mb-6 shadow-sm">
+                                <input type="text" value={invoiceData.projectName} onChange={(e) => handleDataChange('projectName', e.target.value)} className="w-full text-center outline-none bg-transparent font-bold text-gray-800 print:border-none" placeholder="اكتب وصف المشروع أو التفاصيل هنا..." />
+                            </div>
+                        </div>
+
+                        <div className="px-10 relative z-10 flex-grow">
+                            <h3 className="font-bold text-[#2d206b] mb-2 flex items-center gap-2">
+                                <span className="w-2 h-2 bg-[#2d206b] inline-block"></span> الاحتياجات:
+                            </h3>
+                            
+                            <table className="w-full border-collapse border border-gray-400 mb-2 text-sm text-center">
+                                <thead>
+                                    <tr className="bg-[#eeecf5] border-b border-gray-400">
+                                        <th className="border-l border-gray-400 py-2 w-12 font-bold text-[#2d206b]">م</th>
+                                        <th className="border-l border-gray-400 py-2 font-bold text-[#2d206b]">الوصف والبيان</th>
+                                        <th className="border-l border-gray-400 py-2 w-24 font-bold text-[#2d206b]">الكمية</th>
+                                        <th className="border-l border-gray-400 py-2 w-32 font-bold text-[#2d206b]">سعر الوحدة</th>
+                                        <th className="border-l border-gray-400 py-2 w-40 font-bold text-[#2d206b]">الجملة</th>
+                                        <th className="py-2 w-10 print-hidden"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {items.map((item, index) => (
+                                        <tr key={item.id} className="border-b border-gray-300 hover:bg-gray-50 transition-colors">
+                                            <td className="border-l border-gray-400 py-2 bg-gray-100 font-bold">{index + 1}</td>
+                                            <td className="border-l border-gray-400 p-1 text-right">
+                                                <input type="text" value={item.description} onChange={(e) => handleItemChange(item.id, 'description', e.target.value)} className="w-full outline-none bg-transparent px-2" placeholder="وصف العمل أو المادة..." />
+                                            </td>
+                                            <td className="border-l border-gray-400 p-1">
+                                                <input type="number" value={item.qty === 0 ? '' : item.qty} onChange={(e) => handleItemChange(item.id, 'qty', e.target.value)} className="w-full outline-none text-center bg-transparent" placeholder="-" />
+                                            </td>
+                                            <td className="border-l border-gray-400 p-1 bg-gray-50">
+                                                <input type="number" value={item.price === 0 ? '' : item.price} onChange={(e) => handleItemChange(item.id, 'price', e.target.value)} className="w-full outline-none text-center bg-transparent" placeholder="-" />
+                                            </td>
+                                            <td className="border-l border-gray-400 py-2 font-bold bg-gray-100">{item.qty * item.price === 0 ? '-' : formatNumber(item.qty * item.price)}</td>
+                                            <td className="py-1 print-hidden text-center">
+                                                <button onClick={() => removeItem(item.id)} className="text-red-500 hover:text-red-700 p-1"><IconTrash /></button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    
+                                    <tr className={`border-t-2 border-gray-400 bg-[#eeecf5] font-bold ${discountPercent > 0 ? '' : 'text-lg'}`}>
+                                        <td colSpan="4" className="border-l border-gray-400 py-3 text-center text-[#2d206b]">{discountPercent > 0 ? 'الإجمالي (قبل الخصم)' : 'الإجمالي الكلي (الجملة)'}</td>
+                                        <td className={`border-l border-gray-400 py-3 text-center ${discountPercent > 0 ? '' : 'underline decoration-double'}`}>{subTotal === 0 ? '-' : formatNumber(subTotal)}</td>
+                                        <td className="print-hidden"></td>
+                                    </tr>
+
+                                    <tr className={`border-b border-gray-400 font-bold ${(!discountPercent || discountPercent === 0) ? 'print-hidden bg-white text-gray-500' : 'bg-red-50 text-red-600'}`}>
+                                        <td colSpan="3" className="border-l border-gray-400 py-2 text-left px-4">
+                                            الخصم المئوي % {(!discountPercent || discountPercent === 0) && <span className="text-xs font-normal print-hidden">(اكتب النسبة هنا لتفعيل الخصم)</span>}
+                                        </td>
+                                        <td className="border-l border-gray-400 p-1 bg-white">
+                                            <div className="flex items-center justify-center gap-1">
+                                                <input type="number" value={discountPercent === 0 ? '' : discountPercent} onChange={(e) => setDiscountPercent(Number(e.target.value))} className="w-12 outline-none text-center bg-transparent text-red-600 font-bold placeholder-gray-300 border-b border-dashed border-red-300" placeholder="0" min="0" max="100" />
+                                                <span>%</span>
+                                            </div>
+                                        </td>
+                                        <td className="border-l border-gray-400 py-2 text-center bg-red-50" dir="ltr">{discountPercent > 0 ? `- ${formatNumber(discountAmount)}` : '-'}</td>
+                                        <td className="print-hidden"></td>
+                                    </tr>
+
+                                    {discountPercent > 0 && (
+                                        <tr className="border-t-2 border-gray-400 bg-[#2d206b] text-white font-bold text-lg">
+                                            <td colSpan="4" className="border-l border-gray-400 py-3 text-center">الصافي النهائي</td>
+                                            <td className="border-l border-gray-400 py-3 text-center underline decoration-double">{total === 0 ? '-' : formatNumber(total)}</td>
+                                            <td className="print-hidden"></td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+
+                            <button onClick={addItem} className="print-hidden flex items-center gap-1 text-[#4b3b94] hover:text-[#2d206b] text-sm font-bold my-2 mb-6"><IconPlus /> إضافة صنف</button>
+                        </div>
+
+                        <div className="px-10 mt-auto mb-20 flex justify-between items-start relative z-10 gap-6">
+                            <div className="flex-[1.5]">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-sm font-bold text-gray-700">العملة:</span>
+                                    <input type="text" value={invoiceData.currency} onChange={(e) => handleDataChange('currency', e.target.value)} className="border-b border-transparent hover:border-gray-300 focus:border-[#4b3b94] outline-none w-32 font-bold print:border-none bg-transparent" />
+                                </div>
+                                <div className="mt-4">
+                                    <h4 className="font-bold text-[#2d206b] mb-2 flex items-center gap-2">
+                                        <span className="w-2 h-2 bg-[#2d206b] inline-block transform rotate-45"></span> ملاحظات وتنبيهات:
+                                    </h4>
+                                    <textarea value={invoiceData.notes} onChange={(e) => handleDataChange('notes', e.target.value)} className="w-full h-20 outline-none border border-transparent hover:border-gray-300 p-2 bg-transparent resize-none print:border-none text-sm font-bold text-gray-700 leading-relaxed" />
+                                </div>
+                            </div>
+
+                            <div className="flex-1 flex justify-center items-center gap-6 mt-6 opacity-90">
+                                {/* تغيير المسار هنا ليطابق صورك المرفوعة */}
+                                <QRCodeImage src="./facebook.png.png" filename="facebook.png.png" label="Facebook" />
+                                <QRCodeImage src="./tiktok.png.jfif" filename="tiktok.png.jfif" label="TikTok" />
+                            </div>
+
+                            <div className="flex-[0.8] flex flex-col items-center justify-center opacity-80 mt-2">
+                                <div className="w-28 h-28 rounded-full border-4 border-[#2d206b] border-dashed flex items-center justify-center flex-col text-[#2d206b] transform -rotate-12">
+                                    <AmiasLogo className="w-12 h-auto mb-1 opacity-70" />
+                                    <span className="text-[9px] font-bold font-serif text-center uppercase tracking-widest mt-1">AMIAS<br/>APPROVED</span>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-2 text-center font-bold">الختم والتوقيع</p>
+                            </div>
+                        </div>
+
+                        <div className="absolute bottom-0 left-0 w-full mt-4">
+                            <svg className="w-full h-12 pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                <path d="M0,80 Q50,60 100,80 L100,100 L0,100 Z" fill="#D1D5DB" opacity="0.5" />
+                                <path d="M0,100 L100,100 L100,90 Q50,75 0,90 Z" fill="#2d206b" opacity="0.9" />
+                            </svg>
+                            <div className="bg-[#2d206b] text-white py-3 px-8 flex justify-between items-center text-sm" dir="ltr">
+                                <div className="flex items-center gap-2 font-bold tracking-wider"><IconPhone /> <span>0963811138 - 0991090140</span></div>
+                                <div className="flex items-center gap-2 font-bold"><IconHash /> <span>AmiasContracting</span></div>
+                                <div className="flex items-center gap-2 font-bold"><IconMail /> <span>amiasgc@gmail.com</span></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            );
         }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<InvoiceApp />);
     </script>
 </body>
 </html>
