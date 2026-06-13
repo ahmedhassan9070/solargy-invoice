@@ -19,7 +19,6 @@
     <style>
         .font-cursive { font-family: 'Dancing Script', cursive; }
         
-        /* كود الطباعة الإجباري والمعدل لحل مشكلة الصفحة البيضاء جذرياً */
         @media print {
             @page { margin: 0; size: A4 portrait; }
             body, html { 
@@ -31,7 +30,6 @@
             }
             .print-hidden { display: none !important; }
             
-            /* هذه الأسطر تجبر المتصفح على عدم إخفاء الفاتورة خارج الورقة */
             #root, #root > div {
                 display: block !important; 
                 height: auto !important;
@@ -47,7 +45,6 @@
     <script type="text/babel">
         const { useState } = React;
 
-        // --- أيقونات SVG ---
         const IconPrinter = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>;
         const IconPlus = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>;
         const IconTrash = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>;
@@ -161,7 +158,6 @@
             };
 
             return (
-                /* تم إضافة print:block هنا لمنع المتصفح من دفع المحتوى خارج الورقة */
                 <div className="min-h-screen py-8 print:py-0 flex print:block justify-center font-sans print:m-0">
                     
                     <div className="fixed top-4 left-4 z-50 print-hidden flex flex-col gap-3">
@@ -174,8 +170,8 @@
                         </button>
                     </div>
 
-                    {/* تم تعديل overflow-hidden بإضافة print:overflow-visible لمنع القطع والإخفاء */}
-                    <div className="w-full max-w-[210mm] min-h-[297mm] bg-white shadow-2xl print:shadow-none print:w-full relative overflow-hidden print:overflow-visible flex flex-col mx-auto print:block">
+                    {/* تم إزالة المقاس الإجباري min-h-[297mm] ليأخذ الكود حجمه الطبيعي الملموم */}
+                    <div className="w-full max-w-[210mm] bg-white shadow-2xl print:shadow-none print:w-full relative overflow-hidden print:overflow-visible flex flex-col mx-auto print:block">
                         
                         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-5 pointer-events-none">
                             <AmiasLogo className="w-[800px] h-auto" />
@@ -229,7 +225,8 @@
                             </div>
                         </div>
 
-                        <div className="px-10 relative z-10 flex-grow">
+                        {/* تم إزالة flex-grow من هنا لرفع المحتوى لأعلى */}
+                        <div className="px-10 relative z-10 mb-4">
                             <h3 className="font-bold text-[#2d206b] mb-2 flex items-center gap-2">
                                 <span className="w-2 h-2 bg-[#2d206b] inline-block"></span> الاحتياجات:
                             </h3>
@@ -298,7 +295,8 @@
                             <button onClick={addItem} className="print-hidden flex items-center gap-1 text-[#4b3b94] hover:text-[#2d206b] text-sm font-bold my-2 mb-6"><IconPlus /> إضافة صنف</button>
                         </div>
 
-                        <div className="px-10 mt-auto mb-20 flex justify-between items-start relative z-10 gap-6">
+                        {/* تم إزالة mt-auto و mb-20 واستبدالها بمسافات طبيعية لرفع التذييل */}
+                        <div className="px-10 mt-4 mb-8 flex justify-between items-start relative z-10 gap-6">
                             <div className="flex-[1.5]">
                                 <div className="flex items-center gap-2 mb-2">
                                     <span className="text-sm font-bold text-gray-700">العملة:</span>
@@ -326,7 +324,8 @@
                             </div>
                         </div>
 
-                        <div className="absolute bottom-0 left-0 w-full mt-4">
+                        {/* تم إزالة absolute bottom-0 ليأتي الشريط أسفل المحتوى مباشرة */}
+                        <div className="relative w-full">
                             <svg className="w-full h-12 pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
                                 <path d="M0,80 Q50,60 100,80 L100,100 L0,100 Z" fill="#D1D5DB" opacity="0.5" />
                                 <path d="M0,100 L100,100 L100,90 Q50,75 0,90 Z" fill="#2d206b" opacity="0.9" />
