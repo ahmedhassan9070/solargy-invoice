@@ -1,122 +1,91 @@
-import React, { useState } from 'react';
-import { Printer, Plus, Trash2, Phone, Mail, Hash } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فاتورة شركة أمياس للمقاولات</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print { 
+            .print-hidden { display: none !important; }
+            body { background-color: white; padding: 0; }
+            #invoice { border: none; box-shadow: none; width: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
 
-export default function App() {
-  // الحالة العامة للبيانات
-  const [invoiceData, setInvoiceData] = useState({
-    date: new Date().toLocaleDateString('en-GB'),
-    invoiceNumber: 'INV-2026-001',
-    clientName: 'السيد/ ',
-    projectName: '',
-    currency: 'جنيه سوداني',
-    notes: '10 سنوات ضمان للألواح وسنة للنظام.\nالمتابعة ما بعد التركيب.',
-  });
-
-  const [discountPercent, setDiscountPercent] = useState(0);
-  const [items, setItems] = useState([
-    { id: 1, description: 'أعمال خرسانية', qty: 1, price: 0 },
-    { id: 2, description: 'أعمال بناء', qty: 1, price: 0 },
-  ]);
-
-  const handleDataChange = (field, value) => setInvoiceData({ ...invoiceData, [field]: value });
-  
-  const handleItemChange = (id, field, value) => {
-    setItems(items.map(item => item.id === id ? { ...item, [field]: field === 'qty' || field === 'price' ? Number(value) : value } : item));
-  };
-
-  const addItem = () => setItems([...items, { id: Date.now(), description: '', qty: 1, price: 0 }]);
-  const removeItem = (id) => setItems(items.filter(item => item.id !== id));
-
-  const subTotal = items.reduce((sum, item) => sum + (item.qty * item.price), 0);
-  const discountAmount = (subTotal * (discountPercent || 0)) / 100;
-  const total = subTotal - discountAmount;
-
-  const AmiasLogo = ({ className = "w-32 h-auto" }) => (
-    <svg viewBox="0 0 300 180" className={className} xmlns="http://www.w3.org/2000/svg">
-      <g>
-        {[60, 90, 120, 150].map((y, i) => (
-          <g key={`l-${i}`}>
-            <polygon points={`10,${y} 50,${y-15} 50,${y} 10,${y+15}`} fill="#4b3b94" />
-            <polygon points={`50,${y-15} 90,${y} 90,${y+15} 50,${y}`} fill="#2d206b" />
-          </g>
-        ))}
-        {[30, 60, 90, 120, 150].map((y, i) => (
-          <g key={`m-${i}`}>
-            <polygon points={`110,${y} 150,${y-15} 150,${y} 110,${y+15}`} fill="#4b3b94" />
-            <polygon points={`150,${y-15} 190,${y} 190,${y+15} 150,${y}`} fill="#2d206b" />
-          </g>
-        ))}
-        {[60, 90, 120, 150].map((y, i) => (
-          <g key={`r-${i}`}>
-            <polygon points={`210,${y} 250,${y-15} 250,${y} 210,${y+15}`} fill="#4b3b94" />
-            <polygon points={`250,${y-15} 290,${y} 290,${y+15} 250,${y}`} fill="#2d206b" />
-          </g>
-        ))}
-      </g>
-    </svg>
-  );
-
-  return (
-    <div className="min-h-screen bg-gray-100 py-8 print:py-0 print:bg-white flex justify-center font-sans" dir="rtl">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
-        @media print { .print-hidden { display: none !important; } }
-      `}</style>
-
-      <button onClick={() => window.print()} className="fixed top-4 left-4 z-50 print-hidden bg-[#2d206b] text-white p-4 rounded-full shadow-lg">
-        <Printer size={24} />
-      </button>
-
-      <div className="w-[210mm] min-h-[297mm] bg-white shadow-2xl print:shadow-none p-10 flex flex-col relative overflow-hidden">
-        <div className="flex justify-between items-center border-b-2 border-[#2d206b] pb-4 mb-8">
-          <h1 className="text-3xl font-bold text-[#2d206b]">شركة امياس للمقاولات</h1>
-          <AmiasLogo className="w-24 h-auto" />
-          <h1 className="text-4xl font-bold text-[#2d206b]" style={{fontFamily: 'Dancing Script'}}>Amias</h1>
+    <div id="invoice" class="max-w-4xl mx-auto bg-white p-8 shadow-lg border border-gray-200">
+        <div class="flex justify-between items-center border-b pb-4 mb-6">
+            <h1 class="text-2xl font-bold text-blue-900">شركة أمياس للمقاولات</h1>
+            <div class="text-left font-bold text-blue-900">Amias Contracting</div>
         </div>
 
-        <div className="flex justify-between font-bold mb-8">
-          <div>التاريخ: <input className="border-b outline-none w-32" value={invoiceData.date} onChange={(e) => handleDataChange('date', e.target.value)} /></div>
-          <div>العميل: <input className="border-b outline-none w-48" value={invoiceData.clientName} onChange={(e) => handleDataChange('clientName', e.target.value)} /></div>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div>التاريخ: <input type="text" class="border-b outline-none w-full" value="13/06/2026"></div>
+            <div>العميل: <input type="text" class="border-b outline-none w-full" placeholder="اسم العميل..."></div>
         </div>
 
-        <table className="w-full border-collapse border border-gray-300 text-center mb-8">
-          <thead className="bg-[#2d206b] text-white">
-            <tr>
-              <th className="border p-2">م</th>
-              <th className="border p-2">البيان</th>
-              <th className="border p-2">الكمية</th>
-              <th className="border p-2">السعر</th>
-              <th className="border p-2">الإجمالي</th>
-              <th className="border p-2 print-hidden">حذف</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item, idx) => (
-              <tr key={item.id}>
-                <td className="border p-2">{idx + 1}</td>
-                <td className="border p-2"><input className="w-full outline-none" value={item.description} onChange={(e) => handleItemChange(item.id, 'description', e.target.value)} /></td>
-                <td className="border p-2"><input type="number" className="w-full outline-none" value={item.qty} onChange={(e) => handleItemChange(item.id, 'qty', e.target.value)} /></td>
-                <td className="border p-2"><input type="number" className="w-full outline-none" value={item.price} onChange={(e) => handleItemChange(item.id, 'price', e.target.value)} /></td>
-                <td className="border p-2">{item.qty * item.price}</td>
-                <td className="border p-2 print-hidden"><button onClick={() => removeItem(item.id)} className="text-red-500"><Trash2 size={16} /></button></td>
-              </tr>
-            ))}
-          </tbody>
+        <table class="w-full border-collapse border border-gray-300 text-center mb-6">
+            <thead class="bg-blue-900 text-white">
+                <tr>
+                    <th class="border p-2">البيان</th>
+                    <th class="border p-2">الكمية</th>
+                    <th class="border p-2">السعر</th>
+                    <th class="border p-2">الإجمالي</th>
+                    <th class="border p-2 print-hidden">إجراء</th>
+                </tr>
+            </thead>
+            <tbody id="itemsBody">
+                <tr>
+                    <td class="border p-2"><input type="text" class="w-full outline-none"></td>
+                    <td class="border p-2"><input type="number" class="w-full outline-none qty" value="1" oninput="calculate()"></td>
+                    <td class="border p-2"><input type="number" class="w-full outline-none price" value="0" oninput="calculate()"></td>
+                    <td class="border p-2 total font-bold">0</td>
+                    <td class="border p-2 print-hidden"><button onclick="this.parentElement.parentElement.remove(); calculate()" class="text-red-500 font-bold">حذف</button></td>
+                </tr>
+            </tbody>
         </table>
 
-        <button onClick={addItem} className="print-hidden mb-8 text-[#2d206b] font-bold flex items-center gap-2">
-          <Plus size={20} /> إضافة صنف
-        </button>
+        <button onclick="addRow()" class="print-hidden bg-blue-900 text-white px-4 py-2 rounded mb-6">+ إضافة صنف</button>
 
-        <div className="text-xl font-bold border-t pt-4">
-          الإجمالي النهائي: {total.toLocaleString()} {invoiceData.currency}
+        <div class="text-xl font-bold border-t pt-4">
+            الإجمالي النهائي: <span id="grandTotal">0</span> جنيه سوداني
         </div>
 
-        <div className="mt-auto pt-10 text-sm text-gray-600">
-          <p className="font-bold mb-2">ملاحظات:</p>
-          <textarea className="w-full outline-none resize-none" value={invoiceData.notes} onChange={(e) => handleDataChange('notes', e.target.value)} />
+        <div class="mt-8">
+            <p class="font-bold">ملاحظات:</p>
+            <textarea class="w-full border p-2 mt-2" rows="3">10 سنوات ضمان للألواح وسنة للنظام.</textarea>
         </div>
-      </div>
+
+        <button onclick="window.print()" class="print-hidden mt-8 w-full bg-green-600 text-white py-3 rounded text-lg font-bold">طباعة الفاتورة</button>
     </div>
-  );
-}
+
+    <script>
+        function addRow() {
+            const tbody = document.getElementById('itemsBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="border p-2"><input type="text" class="w-full outline-none"></td>
+                <td class="border p-2"><input type="number" class="w-full outline-none qty" value="1" oninput="calculate()"></td>
+                <td class="border p-2"><input type="number" class="w-full outline-none price" value="0" oninput="calculate()"></td>
+                <td class="border p-2 total font-bold">0</td>
+                <td class="border p-2 print-hidden"><button onclick="this.parentElement.parentElement.remove(); calculate()" class="text-red-500 font-bold">حذف</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function calculate() {
+            let grandTotal = 0;
+            document.querySelectorAll('#itemsBody tr').forEach(row => {
+                const qty = parseFloat(row.querySelector('.qty').value) || 0;
+                const price = parseFloat(row.querySelector('.price').value) || 0;
+                const total = qty * price;
+                row.querySelector('.total').innerText = total;
+                grandTotal += total;
+            });
+            document.getElementById('grandTotal').innerText = grandTotal;
+        }
+    </script>
+</body>
+</html>
