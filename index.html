@@ -18,11 +18,12 @@
     
     <style>
         .font-cursive { font-family: 'Dancing Script', cursive; }
-        /* إعدادات الطباعة لضمان ظهور الألوان */
+        
+        /* إعدادات الطباعة لضمان ظهور الألوان وتجاهل العناصر غير المطلوبة */
         @media print {
             body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .print-hidden { display: none !important; }
-            @page { margin: 0; }
+            @page { margin: 1cm; }
         }
     </style>
 </head>
@@ -43,16 +44,14 @@
         function InvoiceApp() {
             const [invoiceData, setInvoiceData] = useState({
                 date: new Date().toLocaleDateString('en-GB'),
-                invoiceNumber: '', // تم التفريغ
-                clientName: '', // تم التفريغ
+                invoiceNumber: '', 
+                clientName: '', 
                 projectName: '', 
                 currency: 'جنيه سوداني',
                 notes: '10 سنوات ضمان للألواح وسنة للنظام.\nالمتابعة ما بعد التركيب.',
             });
 
             const [discountPercent, setDiscountPercent] = useState(0);
-
-            // تم تصفير الجدول (4 صفوف فارغة)
             const [items, setItems] = useState([
                 { id: 1, description: '', qty: 0, price: 0 },
                 { id: 2, description: '', qty: 0, price: 0 },
@@ -131,7 +130,7 @@
                     <div className="flex flex-col items-center">
                         {error ? (
                             <div className="w-16 h-16 bg-gray-200 border-2 border-dashed border-gray-400 rounded-md flex items-center justify-center text-center p-1">
-                                <span className="text-[9px] text-gray-500 leading-tight">ضع صورة<br/>{filename}<br/>هنا</span>
+                                <span className="text-[9px] text-gray-500 leading-tight">صورة<br/>{filename}</span>
                             </div>
                         ) : (
                             <img 
@@ -192,8 +191,6 @@
                                     <input type="text" value={invoiceData.date} onChange={(e) => handleDataChange('date', e.target.value)} className="border-b border-transparent hover:border-gray-300 focus:border-[#4b3b94] outline-none w-28 text-left print:border-none bg-transparent" />
                                 </div>
                                 <div className="flex-1 flex justify-center items-center relative">
-                                    <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-3 h-3 bg-gray-300 rounded-full hidden md:block"></div>
-                                    <div className="absolute top-1/2 right-0 transform -translate-y-1/2 w-3 h-3 bg-gray-300 rounded-full hidden md:block"></div>
                                     <h2 className="text-2xl font-bold text-[#2d206b] border-b-4 border-gray-300 pb-1 px-8 text-center">فاتورة</h2>
                                 </div>
                                 <div className="flex-1 flex items-center justify-end gap-2">
@@ -234,7 +231,7 @@
                                         <tr key={item.id} className="border-b border-gray-300 hover:bg-gray-50 transition-colors">
                                             <td className="border-l border-gray-400 py-2 bg-gray-100 font-bold">{index + 1}</td>
                                             <td className="border-l border-gray-400 p-1 text-right">
-                                                <input type="text" value={item.description} onChange={(e) => handleItemChange(item.id, 'description', e.target.value)} className="w-full outline-none bg-transparent px-2" placeholder="وصف العمل أو المادة..." />
+                                                <input type="text" value={item.description} onChange={(e) => handleItemChange(item.id, 'description', e.target.value)} className="w-full outline-none bg-transparent px-2" placeholder="وصف العمل..." />
                                             </td>
                                             <td className="border-l border-gray-400 p-1">
                                                 <input type="number" value={item.qty === 0 ? '' : item.qty} onChange={(e) => handleItemChange(item.id, 'qty', e.target.value)} className="w-full outline-none text-center bg-transparent" placeholder="-" />
@@ -254,31 +251,8 @@
                                         <td className={`border-l border-gray-400 py-3 text-center ${discountPercent > 0 ? '' : 'underline decoration-double'}`}>{subTotal === 0 ? '-' : formatNumber(subTotal)}</td>
                                         <td className="print-hidden"></td>
                                     </tr>
-
-                                    <tr className={`border-b border-gray-400 font-bold ${(!discountPercent || discountPercent === 0) ? 'print-hidden bg-white text-gray-500' : 'bg-red-50 text-red-600'}`}>
-                                        <td colSpan="3" className="border-l border-gray-400 py-2 text-left px-4">
-                                            الخصم المئوي % {(!discountPercent || discountPercent === 0) && <span className="text-xs font-normal print-hidden">(اكتب النسبة هنا لتفعيل الخصم)</span>}
-                                        </td>
-                                        <td className="border-l border-gray-400 p-1 bg-white">
-                                            <div className="flex items-center justify-center gap-1">
-                                                <input type="number" value={discountPercent === 0 ? '' : discountPercent} onChange={(e) => setDiscountPercent(Number(e.target.value))} className="w-12 outline-none text-center bg-transparent text-red-600 font-bold placeholder-gray-300 border-b border-dashed border-red-300" placeholder="0" min="0" max="100" />
-                                                <span>%</span>
-                                            </div>
-                                        </td>
-                                        <td className="border-l border-gray-400 py-2 text-center bg-red-50" dir="ltr">{discountPercent > 0 ? `- ${formatNumber(discountAmount)}` : '-'}</td>
-                                        <td className="print-hidden"></td>
-                                    </tr>
-
-                                    {discountPercent > 0 && (
-                                        <tr className="border-t-2 border-gray-400 bg-[#2d206b] text-white font-bold text-lg">
-                                            <td colSpan="4" className="border-l border-gray-400 py-3 text-center">الصافي النهائي</td>
-                                            <td className="border-l border-gray-400 py-3 text-center underline decoration-double">{total === 0 ? '-' : formatNumber(total)}</td>
-                                            <td className="print-hidden"></td>
-                                        </tr>
-                                    )}
                                 </tbody>
                             </table>
-
                             <button onClick={addItem} className="print-hidden flex items-center gap-1 text-[#4b3b94] hover:text-[#2d206b] text-sm font-bold my-2 mb-6"><IconPlus /> إضافة صنف</button>
                         </div>
 
@@ -290,44 +264,30 @@
                                 </div>
                                 <div className="mt-4">
                                     <h4 className="font-bold text-[#2d206b] mb-2 flex items-center gap-2">
-                                        <span className="w-2 h-2 bg-[#2d206b] inline-block transform rotate-45"></span> ملاحظات وتنبيهات:
+                                        <span className="w-2 h-2 bg-[#2d206b] inline-block transform rotate-45"></span> ملاحظات:
                                     </h4>
                                     <textarea value={invoiceData.notes} onChange={(e) => handleDataChange('notes', e.target.value)} className="w-full h-20 outline-none border border-transparent hover:border-gray-300 p-2 bg-transparent resize-none print:border-none text-sm font-bold text-gray-700 leading-relaxed" />
                                 </div>
                             </div>
-
                             <div className="flex-1 flex justify-center items-center gap-6 mt-6 opacity-90">
-                                {/* تغيير المسار هنا ليطابق صورك المرفوعة */}
                                 <QRCodeImage src="./facebook.png.png" filename="facebook.png.png" label="Facebook" />
                                 <QRCodeImage src="./tiktok.png.jfif" filename="tiktok.png.jfif" label="TikTok" />
-                            </div>
-
-                            <div className="flex-[0.8] flex flex-col items-center justify-center opacity-80 mt-2">
-                                <div className="w-28 h-28 rounded-full border-4 border-[#2d206b] border-dashed flex items-center justify-center flex-col text-[#2d206b] transform -rotate-12">
-                                    <AmiasLogo className="w-12 h-auto mb-1 opacity-70" />
-                                    <span className="text-[9px] font-bold font-serif text-center uppercase tracking-widest mt-1">AMIAS<br/>APPROVED</span>
-                                </div>
-                                <p className="text-xs text-gray-500 mt-2 text-center font-bold">الختم والتوقيع</p>
                             </div>
                         </div>
 
                         <div className="absolute bottom-0 left-0 w-full mt-4">
                             <svg className="w-full h-12 pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                <path d="M0,80 Q50,60 100,80 L100,100 L0,100 Z" fill="#D1D5DB" opacity="0.5" />
                                 <path d="M0,100 L100,100 L100,90 Q50,75 0,90 Z" fill="#2d206b" opacity="0.9" />
                             </svg>
                             <div className="bg-[#2d206b] text-white py-3 px-8 flex justify-between items-center text-sm" dir="ltr">
                                 <div className="flex items-center gap-2 font-bold tracking-wider"><IconPhone /> <span>0963811138 - 0991090140</span></div>
-                                <div className="flex items-center gap-2 font-bold"><IconHash /> <span>AmiasContracting</span></div>
                                 <div className="flex items-center gap-2 font-bold"><IconMail /> <span>amiasgc@gmail.com</span></div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             );
         }
-
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<InvoiceApp />);
     </script>
